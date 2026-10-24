@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Eylem Dedektifleri</title>
+  <style>
+    :root { font-family: "Segoe UI", Arial, sans-serif; color: #173e3b; background: #fbf5e9; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; min-height: 100dvh; background: radial-gradient(circle at 6% 14%, #f8d98a66 0, transparent 28%), radial-gradient(circle at 93% 90%, #92cfc466 0, transparent 28%), #fbf5e9; }
+    button { font: inherit; cursor: pointer; touch-action: manipulation; }
+    button:focus-visible { outline: 4px solid #307fca; outline-offset: 5px; }
+    button:disabled { cursor: wait; }
+    [hidden] { display: none !important; }
+    .game { min-height: 100vh; min-height: 100dvh; height: 100vh; height: 100dvh; padding: 22px; display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 18px; }
+    .stage { position: relative; display: grid; place-items: center; min-height: 0; overflow: hidden; border: 7px solid #fffdf8; border-radius: 30px; background: #f1eadc; box-shadow: 0 8px 32px #183d3b16; }
+    .stage::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: 23px; box-shadow: inset 0 0 0 1px #193e3b10; }
+    .picture { display: block; width: 100%; height: 100%; min-height: 0; object-fit: contain; position: absolute; inset: 0; }
+    .welcome { display: grid; place-items: center; width: 100%; height: 100%; background: radial-gradient(circle at center, #fff9ea 0 28%, #e7eee6 75%); }
+    .welcome svg { width: min(42vh, 58vw); height: auto; filter: drop-shadow(0 14px 0 #244a4320); }
+    .controls { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 18px; padding: 0 12px 4px; }
+    .primary { display: inline-flex; gap: 14px; justify-content: center; align-items: center; min-width: 300px; min-height: 68px; padding: 14px 30px; color: #fff; background: #22635a; border: 0; border-radius: 22px; font-weight: 750; font-size: clamp(20px, 2.3vw, 28px); box-shadow: 0 6px 0 #143f38; transition: background .15s, transform .15s; }
+    .primary:hover:not(:disabled) { background: #2d786d; transform: translateY(-2px); }
+    .primary:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 3px 0 #143f38; }
+    .primary:disabled { opacity: .7; }
+    .secondary { display: inline-flex; gap: 9px; align-items: center; justify-content: center; min-height: 52px; padding: 10px 18px; border: 2px solid #d4dece; border-radius: 17px; color: #315750; background: #fffdf6; font-weight: 650; font-size: 17px; width: max-content; }
+    .secondary:hover { background: #edf3e9; }
+    #reset { justify-self: start; }
+    .tools { position: relative; display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .sound-button { width: 52px; padding: 10px; flex-shrink: 0; }
+    .sound-button[aria-expanded="true"] { background: #e0eee5; border-color: #86b2a1; }
+    .sound-panel { position: absolute; left: 0; bottom: calc(100% + 16px); z-index: 4; width: 270px; max-width: calc(100vw - 28px); padding: 18px; border: 2px solid #d4dece; border-radius: 22px; background: #fffdf6; box-shadow: 0 8px 28px #183d3b26; }
+    .sound-heading { display: flex; justify-content: space-between; gap: 12px; align-items: center; font-weight: 700; }
+    .sound-heading output { color: #22635a; font-variant-numeric: tabular-nums; }
+    .volume-slider { display: block; width: 100%; margin: 18px 0; accent-color: #22635a; cursor: pointer; }
+    .volume-slider:focus-visible { outline: 3px solid #307fca; outline-offset: 5px; border-radius: 8px; }
+    .mute-button { width: 100%; min-height: 42px; font-size: 15px; }
+    #fullscreen { justify-self: end; }
+    button svg { width: 24px; height: 24px; flex-shrink: 0; }
+    .primary svg { width: 30px; height: 30px; }
+    .message { position: fixed; top: 34px; left: 50%; transform: translateX(-50%); z-index: 5; max-width: min(90vw, 700px); padding: 14px 20px; border: 2px solid #d6a766; border-radius: 16px; background: #fff8e8; color: #653e14; box-shadow: 0 5px 24px #0002; font-size: 16px; }
+    .spinning .stage { border-color: #f2c86e; }
+    .spinning .primary svg { animation: turn 1s linear infinite; }
+    @keyframes turn { to { transform: rotate(360deg); } }
+    @media (max-width: 1000px) { .game { padding: 12px; gap: 12px; } .stage { border-width: 5px; border-radius: 22px; } .controls { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding: 0 2px 5px; gap: 14px; } .primary { grid-column: 1 / -1; grid-row: 1; min-width: 0; width: 100%; min-height: 60px; } .secondary { min-height: 46px; max-width: 100%; font-size: 15px; padding: 9px 14px; } }
+    @media (max-height: 480px) and (min-width: 1001px) { .game { padding: 10px; gap: 9px; } .primary { min-height: 50px; padding: 8px 22px; font-size: 21px; } .secondary { min-height: 44px; } }
+    @media (max-width: 450px) { .tools { gap: 4px; } .tools #reset { padding: 9px 6px; gap: 6px; } .sound-button { width: 36px; padding: 6px; } .sound-button svg { width: 20px; } }
+    @media (prefers-reduced-motion: reduce) { .spinning .primary svg { animation: none; } button { transition: none !important; } }
+  </style>
+</head>
+<body>
+  <main class="game" id="game" aria-label="Eylem Dedektifleri oyunu">
+    <div class="stage" id="stage">
+      <div class="welcome" id="welcome" aria-label="Oyun başlamaya hazır">
+        <svg viewBox="0 0 320 320" aria-hidden="true">
+          <circle cx="160" cy="152" r="119" fill="#f3d17b"/>
+          <path d="M233 218 284 272" stroke="#27594f" stroke-width="34" stroke-linecap="round"/>
+          <circle cx="148" cy="138" r="81" fill="#fcfff7" stroke="#27594f" stroke-width="19"/>
+          <circle cx="148" cy="138" r="62" fill="#cfe9e2"/>
+          <path d="M113 110c5-28 58-33 65-4 8 30-30 25-30 50" fill="none" stroke="#27594f" stroke-width="12" stroke-linecap="round"/>
+          <circle cx="148" cy="178" r="7" fill="#27594f"/>
+          <path d="m43 46 4-16 5 16 16 5-16 5-5 16-4-16-16-5zM271 124l4-13 4 13 13 4-13 4-4 13-4-13-13-4z" fill="#e4a347"/>
+          <circle cx="68" cy="256" r="8" fill="#7cafa0"/>
+        </svg>
+      </div>
+      <img id="picture" class="picture" alt="Tahmin edilecek eylem resmi" hidden>
+    </div>
+    <nav class="controls" aria-label="Oyun kontrolleri">
+      <div class="tools">
+      <button class="secondary" id="reset" type="button" aria-label="Resim sırasını başa döndür">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 10a9 9 0 1 1 2 8M3 3v7h7"/></svg>Sıfırla
+      </button>
+        <button class="secondary sound-button" id="sound-toggle" type="button" aria-label="Ses ayarları" aria-expanded="false" aria-controls="sound-panel" title="Ses ayarları">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m11 4-5 4H3v8h3l5 4z" stroke-linejoin="round"/><path id="sound-waves" d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14" stroke-linecap="round"/><path id="sound-slash" d="m15 9 6 6m0-6-6 6" stroke-linecap="round" hidden/></svg>
+        </button>
+        <div class="sound-panel" id="sound-panel" role="group" aria-label="Ses ayarları" hidden>
+          <div class="sound-heading"><label for="volume">Ses seviyesi</label><output id="volume-value" for="volume">%100</output></div>
+          <input class="volume-slider" id="volume" type="range" min="0" max="100" step="1" value="100">
+          <button class="secondary mute-button" id="mute" type="button" aria-pressed="false">Sesi sustur</button>
+        </div>
+      </div>
+      <button class="primary" id="next" type="button" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 5 7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="next-label">Başla</span>
+      </button>
+      <button class="secondary" id="fullscreen" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg><span id="fullscreen-label">Tam ekran</span>
+      </button>
+    </nav>
+  </main>
+  <div id="message" class="message" role="alert" hidden></div>
+  <script>
+    'use strict';
+    const images = [
+      'WhatsApp Image 2026-10-04 at 14.35.55.jpeg',
+      'WhatsApp Image 2026-10-04 at 14.35.55 (1).jpeg',
+      'WhatsApp Image 2026-10-04 at 14.35.56.jpeg',
+      'WhatsApp Image 2026-10-04 at 14.35.56 (1).jpeg',
+      'WhatsApp Image 2026-10-04 at 14.35.56 (2).jpeg',
+      'WhatsApp Image 2026-10-04 at 14.35.56 (3).jpeg',
+      'WhatsApp Image 2026-10-04 at 14.35.56 (4).jpeg',
+      'WhatsApp Image 2026-10-04 at 14.35.56 (5).jpeg',
+      'WhatsApp Image 2026-10-04 at 14.35.56 (6).jpeg',
+      'WhatsApp Image 2026-10-04 at 14.35.56 (7).jpeg',
+      'WhatsApp Image 2026-10-04 at 14.35.56 (8).jpeg',
+      'WhatsApp Image 2026-10-04 at 14.35.56 (9).jpeg',
+      'WhatsApp Image 2026-10-04 at 14.35.56 (10).jpeg',
+      'WhatsApp Image 2026-10-04 at 14.35.57.jpeg',
+      'WhatsApp Image 2026-10-04 at 14.35.57 (1).jpeg',
+      'WhatsApp Image 2026-10-04 at 14.41.37.jpeg'
+    ];
+    const storageKey = 'eylem-dedektifleri.progress.v1';
+    const duration = 3000;
+    const interval = 100;
+    const game = document.getElementById('game');
+    const picture = document.getElementById('picture');
+    const welcome = document.getElementById('welcome');
+    const next = document.getElementById('next');
+    const nextLabel = document.getElementById('next-label');
+    const message = document.getElementById('message');
+    const drum = new Audio('ses/dump_audio.mp3');
+    const finale = new Audio('ses/universfield-comedy-drum-roll-242242.mp3');
+    drum.loop = true;
+    drum.preload = finale.preload = 'auto';
+    const soundStorageKey = 'eylem-dedektifleri.sound.v1';
+    const soundToggle = document.getElementById('sound-toggle');
+    const soundPanel = document.getElementById('sound-panel');
+    const volumeSlider = document.getElementById('volume');
+    const volumeValue = document.getElementById('volume-value');
+    const muteButton = document.getElementById('mute');
+    let soundLevel = 100;
+    let soundMuted = false;
+    let ready = false;
+    let busy = false;
+    let nextIndex = 0;
+    let lastIndex = null;
+    let visibleIndex = null;
+    let timer = null;
+    let finishTimer = null;
+    let selectionId = 0;
+
+    /** Öğretmenin müdahale edebileceği yükleme, ses veya kayıt sorununu bildirir. */
+    function notify(text) {
+      message.textContent = text;
+      message.hidden = false;
+    }
+
+    /** Geçiş ve final sesini aynı ayarla yönetir; mevcut ses dengelerini korur ve düğmeleri günceller. */
+    function applySoundSettings() {
+      const gain = soundMuted ? 0 : soundLevel / 100;
+      drum.volume = 0.55 * gain;
+      finale.volume = 0.65 * gain;
+      volumeSlider.value = soundLevel;
+      volumeValue.textContent = '%' + soundLevel;
+      volumeSlider.setAttribute('aria-valuetext', soundLevel + ' yüzde');
+      const silent = soundMuted || soundLevel === 0;
+      drum.muted = finale.muted = silent;
+      muteButton.textContent = silent ? 'Sesi aç' : 'Sesi sustur';
+      muteButton.setAttribute('aria-pressed', String(silent));
+      document.getElementById('sound-waves').toggleAttribute('hidden', silent);
+      document.getElementById('sound-slash').toggleAttribute('hidden', !silent);
+    }
+
+    /** Öğretmenin ses tercihini sonraki açılış için saklar; oyun sırasının kaydına dokunmaz. */
+    function saveSoundSettings() {
+      try { localStorage.setItem(soundStorageKey, JSON.stringify({ level: soundLevel, muted: soundMuted })); }
+      catch { notify('Ses ayarı kaydedilemiyor. Bu oturumda seçtiğiniz seviye kullanılacak.'); }
+    }
+
+    /** Geçerli ses tercihini geri yükler; eksik veya bozuk kayıtta başlangıç seviyesini kullanır. */
+    function initializeSoundSettings() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(soundStorageKey) || 'null');
+        if (saved && Number.isInteger(saved.level) && saved.level >= 0 && saved.level <= 100 && typeof saved.muted === 'boolean') {
+          soundLevel = saved.level;
+          soundMuted = saved.muted;
+        }
+      } catch { /* Ses kaydı okunamadığında varsayılan seviye ile ders sürdürülebilir. */ }
+      applySoundSettings();
+    }
+
+    /** Ses panelini açar veya kapatır; klavyeyle kapatıldığında odağı ses düğmesine döndürür. */
+    function setSoundPanel(open, restoreFocus = false) {
+      soundPanel.hidden = !open;
+      soundToggle.setAttribute('aria-expanded', String(open));
+      if (restoreFocus) soundToggle.focus();
+    }
+
+    /** Görseli eylemin tamamı görünür kalacak şekilde ekrana getirir. */
+    function showImage(index) {
+      visibleIndex = index;
+      picture.src = 'resimler/' + images[index];
+      picture.hidden = false;
+      welcome.hidden = true;
+    }
+
+    /** Kayıtlı resim varsa onu, yoksa başlangıç simgesini gösterir. */
+    function restoreScreen() {
+      if (lastIndex !== null) showImage(lastIndex);
+      else {
+        picture.hidden = true;
+        picture.removeAttribute('src');
+        welcome.hidden = false;
+        visibleIndex = null;
+      }
+      nextLabel.textContent = lastIndex === null ? 'Başla' : 'Sıradaki öğrenci';
+    }
+
+    /** Devam eden seçimi iptal ederek sesleri ve zamanlayıcıları temizler; sırayı ilerletmez. */
+    function stopSelection() {
+      selectionId++;
+      clearInterval(timer);
+      clearTimeout(finishTimer);
+      timer = finishTimer = null;
+      drum.pause();
+      finale.pause();
+      drum.currentTime = finale.currentTime = 0;
+      busy = false;
+      game.classList.remove('spinning');
+      next.disabled = !ready;
+      next.removeAttribute('aria-busy');
+    }
+
+    /** Öğrenci değişiminden sonra aynı tarayıcıda devam edilebilmesi için ilerlemeyi kaydeder. */
+    function saveProgress() {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify({ version: 1, nextIndex, lastImage: images[lastIndex] }));
+      } catch {
+        notify('İlerleme kaydedilemiyor. Tarayıcı kapanırsa sıra başa dönebilir.');
+      }
+    }
+
+    /** Ses hatasında görsel akışını sürdürür; iptal edilen seçimin geç başlayan sesini durdurur. */
+    function playSound(sound, id) {
+      const playing = sound.play();
+      if (playing) playing.then(() => {
+        if (id !== selectionId) sound.pause();
+      }).catch(() => {
+        if (id === selectionId) notify('Ses çalınamadı. Tarayıcı ve bilgisayarın ses ayarlarını kontrol edin.');
+      });
+    }
+
+    /** Rastgele görünen geçişi başlatır; üç saniye sonunda sabit sıradaki resmi seçer. */
+    function selectNext() {
+      if (!ready || busy) return;
+      stopSelection();
+      const id = selectionId;
+      const target = nextIndex;
+      busy = true;
+      next.disabled = true;
+      next.setAttribute('aria-busy', 'true');
+      game.classList.add('spinning');
+      playSound(drum, id);
+      showRandomImage();
+      timer = setInterval(showRandomImage, interval);
+      finishTimer = setTimeout(() => {
+        if (id !== selectionId) return;
+        clearInterval(timer);
+        timer = finishTimer = null;
+        drum.pause();
+        drum.currentTime = 0;
+        showImage(target);
+        lastIndex = target;
+        nextIndex = (target + 1) % images.length;
+        saveProgress();
+        busy = false;
+        game.classList.remove('spinning');
+        next.disabled = false;
+        next.removeAttribute('aria-busy');
+        nextLabel.textContent = 'Sıradaki öğrenci';
+        playSound(finale, id);
+      }, duration);
+    }
+
+    /** Art arda aynı görseli göstermeden geçişteki rastgelelik hissini oluşturur. */
+    function showRandomImage() {
+      let index = Math.floor(Math.random() * images.length);
+      if (index === visibleIndex) index = (index + 1) % images.length;
+      showImage(index);
+    }
+
+    /** Öğretmenin sıfırlamasıyla kayıtlı ilerlemeyi siler ve ilk seçime döner. */
+    function resetGame() {
+      stopSelection();
+      nextIndex = 0;
+      lastIndex = null;
+      message.hidden = true;
+      try { localStorage.removeItem(storageKey); }
+      catch { notify('Kayıt temizlenemedi. Bu oturumda sıra baştan başlayacak.'); }
+      restoreScreen();
+    }
+
+    /** Derste görseli büyütmek için tarayıcının tam ekran görünümünü açar veya kapatır. */
+    async function toggleFullscreen() {
+      try {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else await document.documentElement.requestFullscreen();
+      } catch { notify('Tam ekran açılamadı. Tarayıcıda F11 tuşunu kullanabilirsiniz.'); }
+    }
+
+    /** Geçerli kaydı geri yükler ve tüm resimleri önceden yükleyerek boş geçişleri önler. */
+    async function initialize() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
+        if (saved && saved.version === 1 && Number.isInteger(saved.nextIndex) && saved.nextIndex >= 0 && saved.nextIndex < images.length) {
+          const previous = images.indexOf(saved.lastImage);
+          if (previous >= 0 && saved.nextIndex === (previous + 1) % images.length) {
+            nextIndex = saved.nextIndex;
+            lastIndex = previous;
+          }
+        }
+      } catch { notify('Kayıt okunamadı. Bu oturumda sıra baştan başlayacak.'); }
+      restoreScreen();
+      try {
+        await Promise.all(images.map(src => new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = resolve;
+          img.onerror = reject;
+          img.src = 'resimler/' + src;
+        })));
+        ready = true;
+        next.disabled = false;
+      } catch { notify('Bir resim yüklenemedi. resimler klasöründeki dosyaları kontrol edin.'); }
+    }
+
+    next.addEventListener('click', selectNext);
+    soundToggle.addEventListener('click', () => setSoundPanel(soundPanel.hidden));
+    volumeSlider.addEventListener('input', () => {
+      soundLevel = Number(volumeSlider.value);
+      soundMuted = false;
+      applySoundSettings();
+    });
+    volumeSlider.addEventListener('change', saveSoundSettings);
+    muteButton.addEventListener('click', () => {
+      if (soundMuted || soundLevel === 0) {
+        soundMuted = false;
+        if (soundLevel === 0) soundLevel = 100;
+      } else soundMuted = true;
+      applySoundSettings();
+      saveSoundSettings();
+    });
+    document.addEventListener('click', event => {
+      if (!soundPanel.hidden && !event.target.closest('.tools')) setSoundPanel(false);
+    });
+    document.getElementById('reset').addEventListener('click', resetGame);
+    document.getElementById('fullscreen').addEventListener('click', toggleFullscreen);
+    document.addEventListener('fullscreenchange', () => {
+      document.getElementById('fullscreen-label').textContent = document.fullscreenElement ? 'Tam ekrandan çık' : 'Tam ekran';
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && !soundPanel.hidden) setSoundPanel(false, true);
+      if (event.code === 'Space' && !event.repeat && (event.target === document.body || event.target === document.documentElement)) {
+        event.preventDefault();
+        selectNext();
+      }
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        stopSelection();
+        restoreScreen();
+      }
+    });
+    window.addEventListener('pagehide', stopSelection);
+    drum.addEventListener('error', () => notify('Geçiş sesi yüklenemedi. ses klasöründeki dump_audio.mp3 dosyasını kontrol edin.'));
+    finale.addEventListener('error', () => notify('Final sesi yüklenemedi. ses klasöründeki ikinci MP3 dosyasını kontrol edin.'));
+    initializeSoundSettings();
+    initialize();
+  </script>
+</body>
+</html>
