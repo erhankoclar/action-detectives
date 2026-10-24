@@ -49,3 +49,19 @@ Sekme gizlenmesi olayı doğrudan tetiklenerek sınandı. Otomasyon penceresinde
 ## Ses ayarı ek kontrolü — 4 Ekim 2026
 
 Chrome ve Edge üzerinde ses seviyesi, sıfır seviyede sessizlik, sustur/aç, önceki seviyeye dönüş, geçiş sırasında susturma, yeniden yüklemede tercihin korunması, Sıfırla ile ses tercihinin korunması, sıralı iki seçim, tam ekranda ses ayarı ve klavye kontrolleri geçti. Bozuk/sınır dışı ses kaydı güvenli başlangıç seviyesine döndü. 13 genişlikte panel açıkken iki tam ekran etiketiyle 26 görünüm kontrolü her tarayıcıda geçti; taşma veya erişilemeyen düğme görülmedi. Masaüstü ve dar pencere ekran görüntüleri incelendi. JavaScript çalışma zamanı hatası görülmedi.
+
+
+## Kategori ve karılmış deste — 24 Ekim 2026
+
+Chrome üzerinde gerçek `file://` sayfası ve ayrı, geçici tarayıcı profiliyle `tests/check-game.cjs` çalıştırıldı. Kullanıcının tarayıcı kaydı değiştirilmedi.
+
+- CLASSROOM LANGUAGE: 16 kartın ilk karılan sıraya birebir uyumu ve tur içinde tekrarsız gösterimi geçti.
+- COUNTRIES & NATIONALITIES: 14 kart için aynı kontroller ve görselle soru metninin eşleşmesi geçti.
+- Her iki kategoride tur sonunda farklı sıra, tur sınırında aynı kartın tekrar etmemesi, sonraki turun ilk kartı, yinelenen başlatma girişiminin engellenmesi geçti.
+- Yeniden yüklemede kategori seçiminin sorulması, seçilen kategorinin destesinin ve konumunun korunması geçti.
+- Geçiş ortasında kategori değiştirme ile iptal ve sıranın korunması, Reset ile yeni deste geçti.
+- Bozuk/tekrarlı kayıtlı destenin yeni geçerli desteyle değiştirilmesi geçti.
+- 30 görsel dosyasının tamamının bulunması doğrulandı; JavaScript çalışma zamanı hatası görülmedi.
+- 1366×768, 820×650, 390×844 ve 850×420 boyutlarında her iki kategoride görsel ve kontrollerin ekrana sığması geçti. Ülkeler kategorisinin masaüstü ve telefon ekran görüntüleri görsel olarak incelendi.
+
+Zaman alan geçişler testte tarayıcının sanal saatiyle ilerletildi. Ses dosyaları ve ses kontrol kodu korunmuştur; bu turda sesin işitsel değerlendirmesi ve önceki sürümün tüm ses/tam ekran hata senaryoları tekrarlanmadı. Build veya lint çalıştırılmadı; statik HTML uygulamasının derleme adımı yoktur.
