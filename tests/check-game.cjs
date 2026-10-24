@@ -75,6 +75,24 @@ async function verifyGame() {
     assert.equal(await page.evaluate(() => new Set(deck).size), 14);
     const allFiles = await page.evaluate(() => Object.entries(categories).flatMap(([id, category]) => category.cards.map(card => 'resimler/' + id + '/' + card.file)));
     allFiles.forEach(file => assert.ok(fs.existsSync(file), file));
+    for (let cardIndex = 0; cardIndex < 14; cardIndex++) {
+      await page.evaluate(index => showImage(index), cardIndex);
+      await page.waitForFunction(() => picture.complete && picture.naturalWidth > 0);
+      assert.equal(await page.locator('#caption').textContent(), await page.evaluate(() => images[visibleIndex].text));
+      for (const [width, height] of [[1366, 768], [390, 844]]) {
+        await page.setViewportSize({ width, height });
+        const fits = await page.evaluate(() => {
+          const imageBox = picture.getBoundingClientRect();
+          const captionBox = caption.getBoundingClientRect();
+          return getComputedStyle(picture).objectFit === 'contain' && imageBox.y >= 0 &&
+            imageBox.bottom <= captionBox.top + 1 && captionBox.bottom <= innerHeight &&
+            document.documentElement.scrollWidth <= innerWidth;
+        });
+        assert.equal(fits, true, 'Full image and caption fit: card ' + cardIndex + ' at ' + width);
+        await page.locator('#stage').screenshot({ path: `output/playwright/flag-${cardIndex}-${width}.png` });
+      }
+    }
+    console.log('PASS all 14 flags: complete image containment and matched questions at desktop and phone sizes');
     assert.deepEqual(errors, []);
     console.log('PASS invalid saved deck recovery, all 30 image paths, no runtime errors');
   } finally { await browser.close(); }

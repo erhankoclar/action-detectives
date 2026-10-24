@@ -65,3 +65,10 @@ Chrome üzerinde gerçek `file://` sayfası ve ayrı, geçici tarayıcı profili
 - 1366×768, 820×650, 390×844 ve 850×420 boyutlarında her iki kategoride görsel ve kontrollerin ekrana sığması geçti. Ülkeler kategorisinin masaüstü ve telefon ekran görüntüleri görsel olarak incelendi.
 
 Zaman alan geçişler testte tarayıcının sanal saatiyle ilerletildi. Ses dosyaları ve ses kontrol kodu korunmuştur; bu turda sesin işitsel değerlendirmesi ve önceki sürümün tüm ses/tam ekran hata senaryoları tekrarlanmadı. Build veya lint çalıştırılmadı; statik HTML uygulamasının derleme adımı yoktur.
+
+
+## Yakın kadraj ve bayrak bütünlüğü — 24 Ekim 2026
+
+Mbappé ve Sokrates kartları, diğer kartlar gibi üst gövde kadrajına güncellendi. Baş, iki el ve bayrağın dört kenarı resim içinde bırakıldı; bayrağın altından bel hizasında gövde ve kıyafetin devamı görünür bırakıldı. İlk kesik bayraklı çıktılar kullanılmadı. Yerleşik Imagegen aracıyla, özgün kişi ve bayrak korunarak, Jackie Chan kartının kadrajı referans alındı. İstek özeti: “Square upper-body portrait; preserve identity; both hands and all four flag edges fully inside canvas; visible clothing-covered torso below the full bottom hem, continuing through the bottom edge like the reference; no legs or feet.”
+
+Güncellenen iki görsel ve 14 ülke kartının tamamı 1366×768 ve 390×844 ekranlarda `object-fit: contain` ile resmin tamamı ve eşleşen soru görünür olacak şekilde odaklı testten geçirildi. İki yeni kartın kaynak görselleri ve uygulamadaki masaüstü/telefon görüntüleri ayrıca görsel olarak incelendi.
